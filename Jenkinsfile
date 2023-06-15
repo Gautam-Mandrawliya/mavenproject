@@ -10,6 +10,7 @@ pipeline {
     stages {
         stage('Test') {
             steps {
+		slackSend channel: 'jenkinsproject', message: 'Job started!'
                 // Maven Testing
                 sh 'mvn test'
             }
@@ -38,7 +39,7 @@ pipeline {
         }
     }
     post {
-        always {
+        always {	
             echo "It is always run!"
         }
         failure {
@@ -46,6 +47,7 @@ pipeline {
         }
         success {
             echo "Success!"
+	    slackSend channel: 'jenkinsproject', message: 'Success!'
         }
     }
 
