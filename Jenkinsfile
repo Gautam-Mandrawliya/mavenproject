@@ -3,14 +3,14 @@ pipeline {
     tools {
         maven 'Maven-Tool' 
     }
-    triggers {
-  	pollSCM 'H/2  *  *  *  *'
-    }
+   // triggers {
+  	//pollSCM 'H/2  *  *  *  *'
+ //   }
 
     stages {
         stage('Test') {
             steps {
-		slackSend channel: 'jenkinsproject', message: 'Job started!'
+	//	slackSend channel: 'jenkinsproject', message: 'Job started!'
                 // Maven Testing
                 sh 'mvn test'
             }
@@ -23,7 +23,7 @@ pipeline {
         }
         stage('Deploy-On-Test') {
             steps {
-                deploy adapters: [tomcat9(credentialsId: 'Tomcat-9', path: '', url: 'http://172.31.35.175:8080')], contextPath: 'webapp', onFailure: false, war: '**/*.war'
+                deploy adapters: [tomcat9(credentialsId: 'Tomcat-9', path: '', url: 'http://172.31.5.144:8080')], contextPath: 'app', onFailure: false, war: '**/*.war'
                 echo 'Deploying to test'
             }
         }
@@ -33,7 +33,7 @@ pipeline {
 	            ok 'Yes we continue'
                 }
             steps {
-                deploy adapters: [tomcat9(credentialsId: 'Tomcat-9', path: '', url: 'http://172.31.35.165:8080')], contextPath: 'webapp', onFailure: false, war: '**/*.war'
+                deploy adapters: [tomcat9(credentialsId: 'Tomcat9', path: '', url: 'http://172.31.13.24:8080')], contextPath: 'app', onFailure: false, war: '**/*.war'
                 echo 'Deploying to prod'
             }
         }
@@ -47,7 +47,7 @@ pipeline {
         }
         success {
             echo "Success!"
-	    slackSend channel: 'jenkinsproject', message: 'Success!'
+	//    slackSend channel: 'jenkinsproject', message: 'Success!'
         }
     }
 
