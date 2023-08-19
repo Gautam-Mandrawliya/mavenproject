@@ -1,0 +1,83 @@
+pipeline {
+    agent any
+    tools {
+        maven 'Maven-Tool'
+    }
+
+    stages {
+        stage('Test') {
+            steps {
+                sh '''
+                slackSend channel: 'mavenproject', message: 'Job Started...'
+                echo "Testing..."
+                mvn test'''
+            }
+            post {
+                failure {
+                    echo "Failed to Testing Stage!!"
+                    slackSend channel: 'mavenproject', message: 'Failed to Test!'
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                sh '''
+                echo "Building..."
+                mvn package'''
+                archiveArtifacts artifacts: '**/*.war', followSymlinks: false
+            }
+            post {
+                failure {
+                    echo "Failed to Building Stage!!"
+                    slackSend channel: 'mavenproject', message: 'Failed to Build!'
+                }
+            }
+        }
+        stage('DeployToTest') {
+            steps {
+                echo 'Deploy to Testing Environment...'
+                deploy adapters: [tomcat9(credentialsId: 'Tomcat-9', path: '', url: 'http://172.31.40.139:8080')], contextPath: 'app', war: '**/*.war'
+            }
+            post {
+                failure {
+                    echo "Failed to Testing Environment!"
+                    slackSend channel: 'mavenproject', message: 'Failed to DeployToTest!'
+                }
+            }
+        }
+        stage('DeployToProd') {
+            input {
+                message "Should we continue?"
+                ok "Yes, we should."
+                submitter "alice,bob"
+            }
+            steps {
+                echo 'Deploy to Production Environment...'
+                deploy adapters: [tomcat9(credentialsId: 'Tomcat-9', path: '', url: 'http://172.31.34.119:8080')], contextPath: 'app', war: '**/*.war'
+            }
+            post {
+                failure {
+                    echo "Failed to Production Environment!"
+                    slackSend channel: 'mavenproject', message: 'Failed to DeployToProd!'
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo "I am always say Hello!"
+        }
+        success {
+            echo "Success!"
+            slackSend channel: 'mavenproject', message: 'Job successfully executed!'
+        }
+        failure {
+            echo "Failed!"
+            slackSend channel: 'mavenproject', message: 'Job Failed!'
+        }
+       aborted {
+           echo "Aborted!"
+           slackSend channel: 'mavenproject', message: 'Job Aborted!'
+       } 
+    }
+}
