@@ -7,10 +7,9 @@ pipeline {
     stages {
         stage('Test') {
             steps {
-                sh '''
                 slackSend channel: 'mavenproject', message: 'Job Started...'
                 echo "Testing..."
-                mvn test'''
+                sh 'mvn test'
             }
             post {
                 failure {
@@ -21,9 +20,8 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh '''
                 echo "Building..."
-                mvn package'''
+                sh 'mvn package'
                 archiveArtifacts artifacts: '**/*.war', followSymlinks: false
             }
             post {
