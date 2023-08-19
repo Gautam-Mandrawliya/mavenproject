@@ -36,7 +36,7 @@ pipeline {
         stage('DeployToTest') {
             steps {
                 echo 'Deploy to Testing Environment...'
-                deploy adapters: [tomcat9(credentialsId: 'Tomcat-9', path: '', url: 'http://172.31.40.139:8080')], contextPath: 'app', war: '**/*.war'
+                deploy adapters: [tomcat9(credentialsId: 'Tomcat-9', path: '', url: 'http://172.31.38.10:8080')], contextPath: 'app', war: '**/*.war'
             }
             post {
                 failure {
@@ -53,7 +53,7 @@ pipeline {
             }
             steps {
                 echo 'Deploy to Production Environment...'
-                deploy adapters: [tomcat9(credentialsId: 'Tomcat-9', path: '', url: 'http://172.31.34.119:8080')], contextPath: 'app', war: '**/*.war'
+                deploy adapters: [tomcat9(credentialsId: 'Tomcat-9', path: '', url: 'http://172.31.42.153:8080')], contextPath: 'app', war: '**/*.war'
             }
             post {
                 failure {
