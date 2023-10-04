@@ -7,14 +7,14 @@ pipeline {
     stages {
         stage('Test') {
             steps {
-                slackSend channel: 'mavenproject', message: 'Job Started...'
+            //    slackSend channel: 'mavenproject', message: 'Job Started...'
                 echo "Testing..."
                 sh 'mvn test'
             }
             post {
                 failure {
                     echo "Failed to Testing Stage!!"
-                    slackSend channel: 'mavenproject', message: 'Failed to Test!'
+              //      slackSend channel: 'mavenproject', message: 'Failed to Test!'
                 }
             }
         }
@@ -27,19 +27,19 @@ pipeline {
             post {
                 failure {
                     echo "Failed to Building Stage!!"
-                    slackSend channel: 'mavenproject', message: 'Failed to Build!'
+                //    slackSend channel: 'mavenproject', message: 'Failed to Build!'
                 }
             }
         }
         stage('DeployToTest') {
             steps {
                 echo 'Deploy to Testing Environment...'
-                deploy adapters: [tomcat9(credentialsId: 'Tomcat-9', path: '', url: 'http://172.31.34.16:8080')], contextPath: 'app', war: '**/*.war'
+                deploy adapters: [tomcat9(credentialsId: 'tomcat/tomcat-9', path: '', url: 'http://172.31.36.42:8080')], contextPath: 'app', war: '**/*.war'
             }
             post {
                 failure {
                     echo "Failed to Testing Environment!"
-                    slackSend channel: 'mavenproject', message: 'Failed to DeployToTest!'
+                //    slackSend channel: 'mavenproject', message: 'Failed to DeployToTest!'
                 }
             }
         }
@@ -51,31 +51,28 @@ pipeline {
             }
             steps {
                 echo 'Deploy to Production Environment...'
-                deploy adapters: [tomcat9(credentialsId: 'Tomcat-9', path: '', url: 'http://172.31.32.48:8080')], contextPath: 'app', war: '**/*.war'
+                deploy adapters: [tomcat9(credentialsId: 'tomcat/tomcat-9', path: '', url: 'http://172.31.44.167:8080')], contextPath: 'app', war: '**/*.war'
             }
             post {
                 failure {
                     echo "Failed to Production Environment!"
-                    slackSend channel: 'mavenproject', message: 'Failed to DeployToProd!'
+                  //  slackSend channel: 'mavenproject', message: 'Failed to DeployToProd!'
                 }
             }
         }
     }
     post {
-        always {
-            echo "I am always say Hello!"
-        }
         success {
             echo "Success!"
-            slackSend channel: 'mavenproject', message: 'Job successfully executed!'
+         //   slackSend channel: 'mavenproject', message: 'Job successfully executed!'
         }
         failure {
             echo "Failed!"
-            slackSend channel: 'mavenproject', message: 'Job Failed!'
+        //    slackSend channel: 'mavenproject', message: 'Job Failed!'
         }
        aborted {
            echo "Aborted!"
-           slackSend channel: 'mavenproject', message: 'Job Aborted!'
+       //    slackSend channel: 'mavenproject', message: 'Job Aborted!'
        } 
     }
 }
